@@ -1,5 +1,7 @@
 import 'package:flutter_client/models/client_type.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_client/models/types.dart';
+import 'package:provider/provider.dart';
 
 import '../components/hamburger_menu.dart';
 import '../components/icon_picker.dart';
@@ -13,12 +15,6 @@ class ClientTypesPage extends StatefulWidget {
 }
 
 class _ClientTypesPageState extends State<ClientTypesPage> {
-  List<ClientType> types = [
-    ClientType(name: 'Platinum', icon: Icons.credit_card),
-    ClientType(name: 'Golden', icon: Icons.card_membership),
-    ClientType(name: 'Titanium', icon: Icons.credit_score),
-    ClientType(name: 'Diamond', icon: Icons.diamond),
-  ];
 
   IconData? selectedIcon;
 
@@ -29,25 +25,29 @@ class _ClientTypesPageState extends State<ClientTypesPage> {
         title: Text(widget.title),
       ),
       drawer: const HamburgerMenu(),
-      body: ListView.builder(
-        itemCount: types.length,
+      body:
+        Consumer(builder: (context,Types list, Widget? widget){
+          return ListView.builder(
+        itemCount: list.types.length,
         itemBuilder: (context, index) {
           return Dismissible(
             key: UniqueKey(),
             background: Container(color: Colors.red),
             child: ListTile(
-              leading: Icon(types[index].icon),
-              title: Text(types[index].name),
+              leading: Icon(list.types[index].icon),
+              title: Text(list.types[index].name),
               iconColor: Colors.deepOrange,
             ),
             onDismissed: (direction) {
               setState(() {
-                types.removeAt(index);
+                list.types.removeAt(index);
               });
             },
           );
         },
-      ),
+      );
+        },), 
+        
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.deepOrange,
         onPressed: () {
@@ -114,7 +114,7 @@ class _ClientTypesPageState extends State<ClientTypesPage> {
                   child: const Text("Salvar"),
                   onPressed: () {
                     selectedIcon ??= Icons.credit_score;
-                    types.add(
+                    Provider.of<Types>(context, listen: false).addType(
                         ClientType(name: nomeInput.text, icon: selectedIcon));
                     selectedIcon = null;
                     setState(() {});
